@@ -29,23 +29,31 @@ def create_app(config_class=Config):
                 default_user = User(name="Friend")
                 db.session.add(default_user)
                 db.session.commit()
+            print("Database initialized successfully")
         except Exception as e:
             print(f"Database initialization error: {e}")
-    
-    # Create database tables
-    with app.app_context():
-        init_db()
     
     @app.before_request
     def ensure_db():
         """Ensure database is initialized for each request in serverless environment"""
-        if os.environ.get('VERCEL'):
+        # Always try to initialize database for serverless/production environments
+        if (os.environ.get('VERCEL') or 
+            os.environ.get('VERCEL_ENV') or 
+            os.environ.get('FLASK_ENV') == 'production'):
             try:
-                # Check if tables exist by trying to query users
+                # Try to query users table to see if it exists
                 User.query.first()
             except Exception:
                 # Tables don't exist, initialize them
-                init_db()
+                with app.app_context():
+                    init_db()
+    
+    # Create database tables for local development
+    if not (os.environ.get('VERCEL') or 
+            os.environ.get('VERCEL_ENV') or 
+            os.environ.get('FLASK_ENV') == 'production'):
+        with app.app_context():
+            init_db()
     
     @app.route('/')
     def index():
