@@ -22,8 +22,8 @@ def create_app(config_class=Config):
     # Create database tables
     with app.app_context():
         try:
-            db.drop_all()  # Drop all existing tables
-            db.create_all()  # Create all tables fresh
+            # Only create tables if they don't exist (don't drop existing data)
+            db.create_all()
             # Create default user if none exists
             if not User.query.first():
                 default_user = User(name="Friend")
