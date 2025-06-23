@@ -19,10 +19,10 @@ def create_app(config_class=Config):
     db.init_app(app)
     csrf = CSRFProtect(app)
     
-    # Create database tables
-    with app.app_context():
+    # Initialize database
+    def init_db():
+        """Initialize database tables and default data"""
         try:
-            # Only create tables if they don't exist (don't drop existing data)
             db.create_all()
             # Create default user if none exists
             if not User.query.first():
@@ -31,6 +31,21 @@ def create_app(config_class=Config):
                 db.session.commit()
         except Exception as e:
             print(f"Database initialization error: {e}")
+    
+    # Create database tables
+    with app.app_context():
+        init_db()
+    
+    @app.before_request
+    def ensure_db():
+        """Ensure database is initialized for each request in serverless environment"""
+        if os.environ.get('VERCEL'):
+            try:
+                # Check if tables exist by trying to query users
+                User.query.first()
+            except Exception:
+                # Tables don't exist, initialize them
+                init_db()
     
     @app.route('/')
     def index():
