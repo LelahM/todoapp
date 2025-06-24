@@ -1,7 +1,7 @@
-from app import create_app
+from app_simple import app
 
-# Create the Flask app instance for Vercel
-app = create_app()
+# Vercel entry point - uses simplified in-memory storage
+# No database dependencies, perfect for serverless
 
 if __name__ == "__main__":
     app.run()
