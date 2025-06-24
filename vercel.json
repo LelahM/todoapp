@@ -18,6 +18,7 @@
   ],
   "env": {
     "VERCEL": "1",
+    "VERCEL_ENV": "production",
     "FLASK_ENV": "production"
   }
 }

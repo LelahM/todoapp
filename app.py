@@ -1,19 +1,31 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 from datetime import datetime, timedelta
-from config import Config
+from config import Config, DevelopmentConfig
 from models import db, User, Task
 from flask_wtf.csrf import CSRFProtect
 import os
 
-def create_app(config_class=Config):
+def create_app(config_class=None):
     app = Flask(__name__)
+    
+    # Choose config based on environment
+    if config_class is None:
+        if os.environ.get('FLASK_ENV') == 'development':
+            config_class = DevelopmentConfig
+        else:
+            config_class = Config
+    
     app.config.from_object(config_class)
     
-    # Ensure instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    # Print database URI for debugging
+    print(f"Using database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
+    
+    # Ensure instance folder exists (only for local development)
+    if app.config.get('DEBUG'):
+        try:
+            os.makedirs(app.instance_path)
+        except OSError:
+            pass
     
     # Initialize extensions
     db.init_app(app)
