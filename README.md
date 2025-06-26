@@ -1,5 +1,6 @@
 # GetTasked - Modern Task Management Application
 
+
 A beautiful, feature-rich task management application built with Flask, featuring a stunning glassmorphism UI design and comprehensive productivity tools.
 
 ## 🌐 Live Demo
@@ -278,10 +279,6 @@ GetTasked is optimized for Vercel's serverless environment with several key adap
 4. Push to branch: `git push origin feature-name`
 5. Submit a Pull Request
 
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details
-
 ## 🎯 Features in Development
 
 - [ ] User authentication
@@ -316,38 +313,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - [ ] Add dark/light theme toggle
 - [ ] Create mobile app version
 
-## 📸 Adding Your Own Screenshots
-
-To add your own screenshot of the live app to the README:
-
-1. **Take a screenshot** of your deployed app:
-   - Visit your app at [https://gettasked.vercel.app](https://gettasked.vercel.app)
-   - Take a screenshot (Cmd+Shift+4 on macOS, Win+Shift+S on Windows)
-   
-2. **Save the screenshot** to your repository:
-   - Name it something like `gettasked-live.png`
-   - Add it to the `screenshots` folder in your repository:
-   ```bash
-   # Run in your project directory
-   mv ~/Downloads/your-screenshot.png ./screenshots/gettasked-live.png
-   ```
-
-3. **Commit and push** the screenshot to GitHub:
-   ```bash
-   git add screenshots/gettasked-live.png
-   git commit -m "Add live app screenshot"
-   git push origin main
-   ```
-
-4. **Update the README.md** with the correct GitHub raw URL:
-   - Change the image path in README.md to:
-   ```
-   ![GetTasked Dashboard](https://raw.githubusercontent.com/LelahM/todoapp/main/screenshots/gettasked-live.png)
-   ```
-
-> **Important:** Always use the full GitHub raw URL format (`https://raw.githubusercontent.com/username/repo/branch/path`) for images in your README to ensure they display properly on both GitHub and other platforms.
-
----
 
 **Made with ❤️ by [LelahM](https://github.com/LelahM)**
 
