@@ -128,7 +128,7 @@ GetTasked/
 ## 📱 Screenshots & Features
 
 ### Main Dashboard
-![GetTasked Dashboard](screenshots/gettasked-mockup.svg)
+![GetTasked Dashboard](https://raw.githubusercontent.com/LelahM/todoapp/main/screenshots/gettasked-mockup.svg)
 - Clean, modern interface with glassmorphism design
 - Task overview with progress statistics
 - Smart reminders section
@@ -149,10 +149,26 @@ GetTasked/
 ## 🌐 Deployment Options
 
 ### 🎯 **Vercel (Recommended)**
-1. Fork this repository
-2. Connect to Vercel
-3. Deploy automatically
-4. **Live Demo**: [https://gettasked.vercel.app](https://gettasked.vercel.app)
+
+This app is optimized for serverless deployment on Vercel. Here's how to deploy your own instance:
+
+1. **Fork this repository** to your GitHub account
+2. **Import project to Vercel**:
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "New Project" 
+   - Import your GitHub repository
+   - Select the "todoapp" repository
+3. **Configure deployment settings**:
+   - Framework Preset: Other
+   - Build Command: `pip install -r requirements_simple.txt`
+   - Output Directory: Leave empty
+   - Install Command: Leave default
+4. **Add environment variables** (optional):
+   - `SECRET_KEY`: Generate a random string for security
+5. **Deploy!** Click "Deploy" and wait for the build to complete
+6. **Visit your deployed app** at the URL provided by Vercel (e.g., `https://your-app-name.vercel.app`)
+
+👉 **Live Demo**: [https://gettasked.vercel.app](https://gettasked.vercel.app)
 
 ### 🛠️ **Other Platforms**
 
@@ -216,6 +232,44 @@ FLASK_ENV=development  # or production
 - Optimized for serverless functions
 - HTTPS enabled by default
 
+## 🚀 Understanding Vercel Deployment
+
+GetTasked is optimized for Vercel's serverless environment with several key adaptations:
+
+### Serverless Optimizations
+- **Simplified Version**: `app_simple.py` uses in-memory storage instead of a database
+- **Vercel Entry Point**: `index.py` serves as the main entry point for Vercel
+- **Reduced Dependencies**: `requirements_simple.txt` contains only the essential packages
+
+### How It Works
+1. When users visit your app, Vercel executes the Flask application in a serverless function
+2. Each function execution is independent (stateless), so data doesn't persist between visits
+3. The app uses in-memory storage for demonstration purposes
+4. Static files (CSS, JS, images) are served directly by Vercel's CDN
+
+### vercel.json Configuration
+```json
+{
+  "version": 2,
+  "builds": [{ 
+    "src": "./index.py", 
+    "use": "@vercel/python" 
+  }],
+  "routes": [{ 
+    "src": "/(.*)", 
+    "dest": "/index.py" 
+  }]
+}
+```
+
+### Important Notes
+- This deployment uses **in-memory storage** - data is reset with each visit
+- For a production app with persistent data, consider adding a database service
+- Vercel serverless functions have a maximum execution time of 10 seconds
+- Static assets in the `static` folder are automatically served
+- Optimized for serverless functions
+- HTTPS enabled by default
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -261,13 +315,37 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - [ ] Implement task sharing functionality
 - [ ] Add dark/light theme toggle
 - [ ] Create mobile app version
-- [ ] Replace mockup with actual app screenshot
 
-> **Note:** To replace the mockup with an actual screenshot of your app:
-> 1. Visit your app at [https://gettasked.vercel.app](https://gettasked.vercel.app)
-> 2. Take a screenshot of the interface (Cmd+Shift+4 on macOS)
-> 3. Save it as `screenshots/gettasked-dashboard.png`
-> 4. Update the README.md image path to `screenshots/gettasked-dashboard.png`
+## 📸 Adding Your Own Screenshots
+
+To add your own screenshot of the live app to the README:
+
+1. **Take a screenshot** of your deployed app:
+   - Visit your app at [https://gettasked.vercel.app](https://gettasked.vercel.app)
+   - Take a screenshot (Cmd+Shift+4 on macOS, Win+Shift+S on Windows)
+   
+2. **Save the screenshot** to your repository:
+   - Name it something like `gettasked-live.png`
+   - Add it to the `screenshots` folder in your repository:
+   ```bash
+   # Run in your project directory
+   mv ~/Downloads/your-screenshot.png ./screenshots/gettasked-live.png
+   ```
+
+3. **Commit and push** the screenshot to GitHub:
+   ```bash
+   git add screenshots/gettasked-live.png
+   git commit -m "Add live app screenshot"
+   git push origin main
+   ```
+
+4. **Update the README.md** with the correct GitHub raw URL:
+   - Change the image path in README.md to:
+   ```
+   ![GetTasked Dashboard](https://raw.githubusercontent.com/LelahM/todoapp/main/screenshots/gettasked-live.png)
+   ```
+
+> **Important:** Always use the full GitHub raw URL format (`https://raw.githubusercontent.com/username/repo/branch/path`) for images in your README to ensure they display properly on both GitHub and other platforms.
 
 ---
 
