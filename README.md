@@ -128,7 +128,7 @@ GetTasked/
 ## 📱 Screenshots & Features
 
 ### Main Dashboard
-![GetTasked Dashboard](https://raw.githubusercontent.com/LelahM/todoapp/main/screenshots/gettasked-mockup.svg)
+![GetTasked Dashboard](https://raw.githubusercontent.com/LelahM/todoapp/main/screenshots/Picture.png)
 - Clean, modern interface with glassmorphism design
 - Task overview with progress statistics
 - Smart reminders section
