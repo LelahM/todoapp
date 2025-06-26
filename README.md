@@ -147,32 +147,6 @@ GetTasked/
 - Progress tracking over time
 - Motivational progress messages
 
-## 🌐 Deployment Options
-
-### 🎯 **Vercel (Recommended)**
-
-This app is optimized for serverless deployment on Vercel. Here's how to deploy your own instance:
-
-1. **Fork this repository** to your GitHub account
-2. **Import project to Vercel**:
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
-   - Click "New Project" 
-   - Import your GitHub repository
-   - Select the "todoapp" repository
-3. **Configure deployment settings**:
-   - Framework Preset: Other
-   - Build Command: `pip install -r requirements_simple.txt`
-   - Output Directory: Leave empty
-   - Install Command: Leave default
-4. **Add environment variables** (optional):
-   - `SECRET_KEY`: Generate a random string for security
-5. **Deploy!** Click "Deploy" and wait for the build to complete
-6. **Visit your deployed app** at the URL provided by Vercel (e.g., `https://your-app-name.vercel.app`)
-
-👉 **Live Demo**: [https://gettasked.vercel.app](https://gettasked.vercel.app)
-
-### 🛠️ **Other Platforms**
-
 #### Render.com
 ```bash
 # Build Command
