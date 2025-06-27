@@ -4,13 +4,17 @@ import os
 import secrets
 import uuid
 import json
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'dev-key-for-demo-change-in-production')
+# Use a more secure secret key generation method
+app.secret_key = os.environ.get('SECRET_KEY', generate_password_hash(secrets.token_hex(32)))
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)  # Set session to last for 31 days
 app.config['SESSION_COOKIE_SECURE'] = os.environ.get('PRODUCTION') == '1'  # Secure cookies in production
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript from accessing cookies
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
+app.config['SESSION_TYPE'] = 'filesystem'  # More reliable than signed cookies
+app.config['SESSION_USE_SIGNER'] = True    # Add cryptographic signing to cookie session ID
 
 # Simple user session-based storage
 class SimpleTask:
@@ -166,6 +170,10 @@ def index():
         # Create a simple user object for template
         user = type('User', (), {'name': user_name, 'id': get_user_id()})()
         
+        # Check for name update notifications
+        name_updated = session.pop('name_updated', False)
+        name_error = session.pop('name_error', False)
+        
         return render_template('index_private.html',
                              user=user,
                              tasks=tasks,
@@ -177,6 +185,8 @@ def index():
                              due_this_week_tasks=due_this_week_tasks,
                              motivation=motivation,
                              reminder="Your data is private to your session",
+                             name_updated=name_updated,
+                             name_error=name_error,
                              datetime=datetime)
     except Exception as e:
         print(f"Error in index route: {e}")
@@ -185,16 +195,15 @@ def index():
 @app.route('/add_task', methods=['POST'])
 def add_task():
     try:
-        title = request.form.get('title')
+        title = request.form.get('task')  # Changed from 'title' to 'task' to match form field
         category = request.form.get('category')
         priority = request.form.get('priority')
         notes = request.form.get('notes')
         due_date_str = request.form.get('due_date')
         due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M') if due_date_str else None
         
-        # Get current user's tasks
-        tasks_data = get_user_tasks()
-        tasks = tasks_from_session_data(tasks_data)
+        # Get current user's tasks (this already returns processed task objects)
+        tasks = get_user_tasks()
         
         # Create new task
         task = SimpleTask(title=title,
@@ -214,9 +223,8 @@ def add_task():
 @app.route('/toggle_task/<task_id>', methods=['POST'])
 def toggle_task(task_id):
     try:
-        # Get current user's tasks
-        tasks_data = get_user_tasks()
-        tasks = tasks_from_session_data(tasks_data)
+        # Get current user's tasks (this already returns processed task objects)
+        tasks = get_user_tasks()
         
         # Find and toggle the task
         task = next((t for t in tasks if t.id == task_id), None)
@@ -234,9 +242,8 @@ def toggle_task(task_id):
 @app.route('/delete_task/<task_id>', methods=['POST'])
 def delete_task(task_id):
     try:
-        # Get current user's tasks
-        tasks_data = get_user_tasks()
-        tasks = tasks_from_session_data(tasks_data)
+        # Get current user's tasks (this already returns processed task objects)
+        tasks = get_user_tasks()
         
         # Remove the task
         tasks = [t for t in tasks if t.id != task_id]
@@ -249,40 +256,29 @@ def delete_task(task_id):
         print(f"Error deleting task: {e}")
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/update_name', methods=['POST', 'GET'])
+@app.route('/update_name', methods=['POST'])
 def update_name():
     try:
-        print("Update name route accessed!")
-        print(f"Request method: {request.method}")
-        print(f"Form data: {request.form}")
-        
-        # For debugging, allow both GET and POST
-        if request.method == 'GET':
-            name = request.args.get('name', 'Test User')
-        else:
-            name = request.form.get('name')
-            
+        name = request.form.get('name')
         if name:
             print(f"Setting user name to: {name}")
             set_user_name(name)
-            session.modified = True  # Ensure session is saved
-            print(f"User name after setting: {get_user_name()}")
+            # Store a success message in session flash
+            session['name_updated'] = True
         else:
             print("No name provided in form")
-            
+            session['name_error'] = True
         return redirect(url_for('index'))
     except Exception as e:
         print(f"Error updating name: {e}")
-        import traceback
-        traceback.print_exc()
+        session['name_error'] = True
         return redirect(url_for('index'))
 
 @app.route('/get_stats')
 def get_stats():
     try:
-        # Get current user's tasks
-        tasks_data = get_user_tasks()
-        tasks = tasks_from_session_data(tasks_data)
+        # Get current user's tasks (this already returns processed task objects)
+        tasks = get_user_tasks()
         
         categories = {}
         completed_by_category = {}

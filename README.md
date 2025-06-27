@@ -11,6 +11,7 @@ A beautiful, feature-rich task management application built with Flask, featurin
 - **🗑️ Data Control**: Clear your data anytime with one click
 - **♻️ Persistent Data**: Your tasks remain available even after closing the browser
 - **⏳ Long-Lasting**: Sessions persist for 31 days without losing your data
+- **🔐 Enhanced Security**: Cryptographic signing for session cookies and improved security measures
 
 ## 🌐 Live Demo
 
@@ -51,6 +52,43 @@ Experience the full-featured todo application with real-time task management, pr
 - 🎨 **Theme Consistency**: Beautiful color coordination
 - 💾 **Secure Storage**: Session-based data storage
 - 🗑️ **Data Control**: Clear your personal data anytime
+
+## 🔄 New Features (June 2025)
+
+- **📊 Task Filtering & Sorting**: Sort tasks by due date, creation date, or priority, and filter by category, status, and more
+- **📈 Enhanced Statistics**: Detailed visualizations of your task data with beautiful charts
+- **🎨 Visual Task Indicators**: Clearer visual indicators for task priorities and deadlines
+- **♿ Accessibility Improvements**: ARIA attributes, keyboard navigation support, and improved color contrast
+- **📱 Responsive Design**: Better responsive design for all screen sizes
+- **🔔 Task Reminders**: Quick view of overdue, due today, and upcoming tasks
+- **🔍 Search & Filter**: Find tasks quickly with powerful search and filter options
+
+## ✅ Fixed Issues (June 27, 2025)
+
+### Issues Resolved:
+1. **✅ Name Editing Fixed**: 
+   - Fixed the `toggleNameEdit()` JavaScript function
+   - Corrected form field name from `'title'` to `'task'` in add_task route
+   - Added proper success/error feedback messages
+   - Name editing now works seamlessly
+
+2. **✅ Charts Now Working**: 
+   - Fixed JavaScript syntax errors in template
+   - Properly structured Chart.js initialization
+   - Charts only display when there are tasks to visualize
+   - Both completion chart (doughnut) and category chart (bar) now render correctly
+
+3. **✅ Template Cleanup**:
+   - Removed corrupted JavaScript code
+   - Created clean, working HTML template
+   - Improved accessibility with ARIA attributes
+   - Added proper error handling for all AJAX requests
+
+### Technical Fixes Made:
+- **Backend**: Fixed parameter mismatch in Flask routes (title → task)
+- **Frontend**: Rebuilt JavaScript with proper syntax and error handling
+- **UI/UX**: Added visual feedback for name updates and better task organization
+- **Charts**: Implemented Chart.js with proper data fetching and rendering
 
 ## 🚀 Quick Deploy
 
