@@ -1,6 +1,14 @@
-# GetTasked - Modern Task Management Application
+# GetTasked - Private Task Management Application
 
-A beautiful, feature-rich task management application built with Flask, featuring a stunning glassmorphism UI design and comprehensive productivity tools.
+A beautiful, feature-rich task management application built with Flask, featuring a stunning glassmorphism UI design and **private user sessions** that keep your data secure and hidden from other users.
+
+## 🔒 Privacy & Security
+
+- **🔐 Individual Sessions**: Each user gets a unique, private session
+- **👤 Data Isolation**: Your tasks are only visible to you
+- **🚫 No Shared Data**: Tasks from other users are completely hidden
+- **💾 Session Storage**: Data is stored securely in your browser session
+- **🗑️ Data Control**: Clear your data anytime with one click
 
 ## 🌐 Live Demo
 
@@ -35,10 +43,12 @@ Experience the full-featured todo application with real-time task management, pr
 - ⏰ **Due Soon**: Upcoming tasks (next 24 hours)
 - 📆 **Due This Week**: Weekly planning overview
 
-### 👤 **Personalization**
-- 🏷️ **Custom Username**: Personalized experience
+### 👤 **Privacy & Personalization**
+- 🔒 **Private Sessions**: Your data is completely isolated from other users
+- 🏷️ **Custom Username**: Personalized experience for each session
 - 🎨 **Theme Consistency**: Beautiful color coordination
-- 💾 **Session Storage**: Maintains state during use
+- 💾 **Secure Storage**: Session-based data storage
+- 🗑️ **Data Control**: Clear your personal data anytime
 
 ## 🚀 Quick Deploy
 
@@ -52,7 +62,8 @@ Experience the full-featured todo application with real-time task management, pr
 - **Styling**: Custom CSS with Glassmorphism
 - **Icons**: Unicode Emojis
 - **Deployment**: Vercel (Serverless)
-- **Storage**: In-memory (demo) / SQLite (local)
+- **Storage**: Private Session Storage (secure & isolated)
+- **Privacy**: Individual user sessions with data isolation
 
 ## 📊 Database Structure
 
@@ -234,18 +245,25 @@ FLASK_ENV=development  # or production
 
 ## 🚀 Understanding Vercel Deployment
 
-GetTasked is optimized for Vercel's serverless environment with several key adaptations:
+GetTasked is optimized for Vercel's serverless environment with privacy-focused adaptations:
+
+### Privacy & Security Features
+- **Session-Based Storage**: Each user gets a unique session with isolated data
+- **Private Sessions**: Your tasks are never visible to other users
+- **Secure Entry Point**: `app_private.py` ensures data isolation
+- **No Shared State**: Each user session is completely independent
 
 ### Serverless Optimizations
-- **Simplified Version**: `app_simple.py` uses in-memory storage instead of a database
+- **Private Version**: `app_private.py` uses secure session storage
 - **Vercel Entry Point**: `index.py` serves as the main entry point for Vercel
-- **Reduced Dependencies**: `requirements_simple.txt` contains only the essential packages
+- **Reduced Dependencies**: Optimized for serverless deployment
 
 ### How It Works
-1. When users visit your app, Vercel executes the Flask application in a serverless function
-2. Each function execution is independent (stateless), so data doesn't persist between visits
-3. The app uses in-memory storage for demonstration purposes
-4. Static files (CSS, JS, images) are served directly by Vercel's CDN
+1. When you visit the app, Vercel creates a secure session just for you
+2. Your tasks are stored in your private session and never shared
+3. Other users cannot see your data, even on the same deployment
+4. You can clear your personal data anytime using the "Clear My Data" button
+5. Static files (CSS, JS, images) are served directly by Vercel's CDN
 
 ### vercel.json Configuration
 ```json
@@ -262,13 +280,12 @@ GetTasked is optimized for Vercel's serverless environment with several key adap
 }
 ```
 
-### Important Notes
-- This deployment uses **in-memory storage** - data is reset with each visit
-- For a production app with persistent data, consider adding a database service
-- Vercel serverless functions have a maximum execution time of 10 seconds
+### Privacy Notes
+- **Session Storage**: Your data is stored securely in your browser session
+- **Data Isolation**: Complete separation between different users
+- **No Persistence**: Data is automatically cleared when your session ends
+- **User Control**: You can manually clear your data anytime
 - Static assets in the `static` folder are automatically served
-- Optimized for serverless functions
-- HTTPS enabled by default
 
 ## 🤝 Contributing
 

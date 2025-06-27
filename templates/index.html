@@ -392,10 +392,17 @@
         <div class="user-greeting">
             <h2>Hello, {{ user.name }}! 👋</h2>
             <button onclick="toggleNameEdit()" class="edit-name-btn">Edit Name</button>
+            <div style="margin-top: 10px; font-size: 0.9rem; color: #4ecdc4;">
+                🔒 Private Session - Your data is secure and not visible to others
+            </div>
             <form id="nameForm" action="{{ url_for('update_name') }}" method="POST" style="display: none; margin-top: 15px;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="text" name="name" placeholder="Enter your name" required style="margin-right: 10px;">
                 <button type="submit" class="edit-name-btn">Save</button>
+            </form>
+            <form action="{{ url_for('clear_session') }}" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Are you sure you want to clear all your data? This cannot be undone.')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="edit-name-btn" style="background: rgba(255, 107, 107, 0.3);">Clear My Data</button>
             </form>
         </div>
 
@@ -689,9 +696,5 @@
             }
         });
     </script>
-    
-    <footer style="text-align: center; padding: 20px; margin-top: 30px; font-size: 0.8rem; opacity: 0.8; border-top: 1px solid rgba(255,255,255,0.1);">
-        <p>GetTasked - © 2025 Le'lah Mckoy. All Rights Reserved.</p>
-    </footer>
 </body>
 </html>

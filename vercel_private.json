@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "./index_private.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index_private.py"
+    }
+  ],
+  "env": {
+    "SECRET_KEY": "@secret_key"
+  }
+}

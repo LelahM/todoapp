@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetTasked - Private Session</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .app-title {
+            text-align: center;
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .privacy-badge {
+            text-align: center;
+            background: rgba(76, 205, 196, 0.2);
+            border-radius: 25px;
+            padding: 10px 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(76, 205, 196, 0.3);
+        }
+
+        .privacy-badge .icon {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+
+        .user-greeting {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-greeting h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 107, 107, 0.5);
+        }
+
+        .progress-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            height: 20px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            height: 100%;
+            border-radius: 25px;
+            transition: width 0.5s ease;
+        }
+
+        .motivation-message {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #ffd93d;
+            margin-top: 15px;
+        }
+
+        .task-form {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .form-row input, .form-row select, .form-row textarea {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-row input::placeholder, .form-row select::placeholder, .form-row textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-row button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .form-row button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .tasks-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .task-list {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .task-list h3 {
+            margin-bottom: 20px;
+            color: #4ecdc4;
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+            border-left-color: #4ecdc4;
+        }
+
+        .task-item.priority-high {
+            border-left-color: #ff6b6b;
+        }
+
+        .task-item.priority-medium {
+            border-left-color: #ffd93d;
+        }
+
+        .task-item.priority-low {
+            border-left-color: #6c5ce7;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .task-meta {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .task-notes {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .task-actions {
+            margin-left: 15px;
+        }
+
+        .delete-btn {
+            background: rgba(255, 107, 107, 0.3);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 107, 107, 0.5);
+            transform: scale(1.1);
+        }
+
+        .analytics-section {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: #4ecdc4;
+        }
+
+        .chart-container canvas {
+            max-height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .tasks-section, .analytics-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-title {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="app-title">GetTasked</h1>
+        
+        <div class="privacy-badge">
+            <span class="icon">🔒</span>
+            <strong>Private Session Active</strong> - Your data is secure and only visible to you
+        </div>
+
+        <div class="user-greeting">
+            <h2>Hello, {{ user.name }}! 👋</h2>
+            <button onclick="toggleNameEdit()" class="btn">Edit Name</button>
+            <form id="nameForm" action="{{ url_for('update_name') }}" method="POST" style="display: none; margin-top: 15px;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="text" name="name" placeholder="Enter your name" required style="margin-right: 10px;">
+                <button type="submit" class="btn">Save</button>
+            </form>
+            <form action="{{ url_for('clear_session') }}" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Are you sure you want to clear all your data? This cannot be undone.')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger">Clear My Data</button>
+            </form>
+        </div>
+
+        <div class="progress-section">
+            <div id="progress-stats">
+                <strong>Progress: {{ complete_tasks }}/{{ total_tasks }} completed</strong>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ (complete_tasks / total_tasks * 100) if total_tasks > 0 else 0 }}%;"></div>
+            </div>
+            <div class="motivation-message">{{ motivation }}</div>
+        </div>
+
+        <div class="task-form">
+            <form action="{{ url_for('add_task') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-row">
+                    <input type="text" name="title" placeholder="What needs to be done?" required>
+                    <select name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="work">💼 Work</option>
+                        <option value="school">📚 School</option>
+                        <option value="personal">👤 Personal</option>
+                        <option value="shopping">🛒 Shopping</option>
+                        <option value="other">📋 Other</option>
+                    </select>
+                    <select name="priority" required>
+                        <option value="">Priority</option>
+                        <option value="high">🔴 High</option>
+                        <option value="medium">🟡 Medium</option>
+                        <option value="low">🟢 Low</option>
+                    </select>
+                    <input type="datetime-local" name="due_date" required>
+                    <button type="submit">Add Task</button>
+                </div>
+                <textarea name="notes" placeholder="Task notes (optional)" rows="2" style="width: 100%; margin-top: 10px;"></textarea>
+            </form>
+        </div>
+
+        <div class="tasks-section">
+            <div class="task-list">
+                <h3>📋 Current Tasks</h3>
+                {% for task in tasks %}
+                    <div class="task-item {% if task.completed %}completed{% endif %} priority-{{ task.priority }}">
+                        <input type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %} 
+                               onchange="toggleTask('{{ task.id }}')">
+                        <div class="task-content">
+                            <div class="task-title">{{ task.title }}</div>
+                            <div class="task-meta">
+                                <span>📂 {{ task.category.title() }}</span>
+                                <span>⭐ {{ task.priority.title() }}</span>
+                                {% if task.due_date %}
+                                    <span>📅 {{ task.due_date.strftime('%m/%d %I:%M %p') }}</span>
+                                {% endif %}
+                            </div>
+                            {% if task.notes %}
+                                <div class="task-notes">{{ task.notes }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="task-actions">
+                            <button class="delete-btn" onclick="deleteTask('{{ task.id }}')">🗑️</button>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                {% if not tasks %}
+                    <div style="text-align: center; opacity: 0.7; margin: 40px 0;">
+                        <p>No tasks yet! Add your first task above. 🌟</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="task-list">
+                <h3>⏰ Reminders</h3>
+                
+                {% if overdue_tasks %}
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #ff6b6b; margin-bottom: 10px;">🚨 Overdue ({{ overdue_tasks|length }})</h4>
+                        {% for task in overdue_tasks %}
+                            <div class="task-item priority-high">
+                                <span style="margin-right: 10px;">⚠️</span>
+                                <div>
+                                    <strong>{{ task.title }}</strong><br>
+                                    <small>Due: {{ task.due_date.strftime('%m/%d %I:%M %p') }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if due_today_tasks %}
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #ffd93d; margin-bottom: 10px;">📅 Due Today ({{ due_today_tasks|length }})</h4>
+                        {% for task in due_today_tasks %}
+                            <div class="task-item priority-medium">
+                                <span style="margin-right: 10px;">📅</span>
+                                <div>
+                                    <strong>{{ task.title }}</strong><br>
+                                    <small>Due: {{ task.due_date.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if due_soon_tasks %}
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #4ecdc4; margin-bottom: 10px;">⏰ Due Soon ({{ due_soon_tasks|length }})</h4>
+                        {% for task in due_soon_tasks %}
+                            <div class="task-item priority-low">
+                                <span style="margin-right: 10px;">⏰</span>
+                                <div>
+                                    <strong>{{ task.title }}</strong><br>
+                                    <small>Due: {{ task.due_date.strftime('%m/%d %I:%M %p') }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if not overdue_tasks and not due_today_tasks and not due_soon_tasks %}
+                    <div style="text-align: center; opacity: 0.7; margin: 40px 0;">
+                        <p>All caught up! No urgent reminders. ✨</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="analytics-section">
+            <div class="chart-container">
+                <h3>📊 Tasks by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>✅ Completion Status</h3>
+                <canvas id="completionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleNameEdit() {
+            const form = document.getElementById('nameForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleTask(taskId) {
+            fetch(`/toggle_task/${taskId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                fetch(`/delete_task/${taskId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+            }
+        }
+
+        // Load analytics charts
+        fetch('/get_stats')
+            .then(response => response.json())
+            .then(data => {
+                // Category chart
+                const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+                new Chart(categoryCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(data.categories),
+                        datasets: [{
+                            data: Object.values(data.categories),
+                            backgroundColor: [
+                                '#4ecdc4',
+                                '#ff6b6b', 
+                                '#ffd93d',
+                                '#6c5ce7',
+                                '#a29bfe'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        }
+                    }
+                });
+
+                // Completion chart
+                const completionCtx = document.getElementById('completionChart').getContext('2d');
+                new Chart(completionCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data.completion),
+                        datasets: [{
+                            data: Object.values(data.completion),
+                            backgroundColor: ['#4ecdc4', '#ff6b6b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        }
+                    }
+                });
+            });
+    </script>
+</body>
+</html>
