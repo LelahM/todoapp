@@ -38,6 +38,8 @@ def get_user_name():
 def set_user_name(name):
     """Set user name in session"""
     session['user_name'] = name
+    # Make sure the session is saved immediately
+    session.modified = True
 
 def get_user_tasks():
     """Get tasks for the current user session"""
@@ -251,7 +253,11 @@ def delete_task(task_id):
 def update_name():
     try:
         name = request.form.get('name')
-        set_user_name(name)
+        if name:
+            print(f"Setting user name to: {name}")
+            set_user_name(name)
+        else:
+            print("No name provided in form")
         return redirect(url_for('index'))
     except Exception as e:
         print(f"Error updating name: {e}")
