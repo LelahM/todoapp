@@ -11,5 +11,9 @@
       "src": "/(.*)",
       "dest": "/index.py"
     }
-  ]
+  ],
+  "env": {
+    "SECRET_KEY": "secure-key-for-production-change-this",
+    "SESSION_TYPE": "filesystem"
+  }
 }

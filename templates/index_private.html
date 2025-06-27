@@ -49,12 +49,27 @@
             background: rgba(76, 205, 196, 0.2);
             border-radius: 25px;
             padding: 10px 20px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             border: 1px solid rgba(76, 205, 196, 0.3);
         }
 
         .privacy-badge .icon {
             font-size: 1.2rem;
+            margin-right: 8px;
+        }
+        
+        .persistence-notice {
+            text-align: center;
+            background: rgba(108, 92, 231, 0.2);
+            border-radius: 25px;
+            padding: 8px 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            font-size: 0.9rem;
+        }
+        
+        .persistence-notice .icon {
+            font-size: 1.1rem;
             margin-right: 8px;
         }
 
@@ -66,6 +81,25 @@
         .user-greeting h2 {
             font-size: 2rem;
             margin-bottom: 10px;
+        }
+        
+        .name-edit-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .btn-small {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        
+        #nameForm {
+            display: none;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn {
@@ -306,6 +340,25 @@
                 font-size: 3rem;
             }
         }
+        
+        .copyright {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 300;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+        }
+        
+        .copyright p {
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
@@ -314,19 +367,26 @@
         
         <div class="privacy-badge">
             <span class="icon">🔒</span>
-            <strong>Private Session Active</strong> - Your data is secure and only visible to you
+            <strong>Private Session Active</strong> - Your data is secure, only visible to you, and will persist for 31 days
+        </div>
+        
+        <div class="persistence-notice">
+            <span class="icon">💾</span>
+            <span>Your tasks will be saved even if you close this tab or browser</span>
         </div>
 
         <div class="user-greeting">
             <h2>Hello, {{ user.name }}! 👋</h2>
-            <button onclick="toggleNameEdit()" class="btn">Edit Name</button>
-            <form id="nameForm" action="{{ url_for('update_name') }}" method="POST" style="display: none; margin-top: 15px;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="text" name="name" placeholder="Enter your name" required style="margin-right: 10px;">
-                <button type="submit" class="btn">Save</button>
-            </form>
+            <div class="name-edit-container">
+                <button onclick="toggleNameEdit()" class="btn btn-small">Edit Name</button>
+                <form id="nameForm" action="{{ url_for('update_name') }}" method="POST" style="display: none; margin-top: 10px;">
+                    <input type="text" name="name" placeholder="Enter your name" value="{{ user.name }}" required style="margin-right: 10px; padding: 8px; border-radius: 4px; border: none;">
+                    <button type="submit" class="btn">Save</button>
+                    <button type="button" class="btn" onclick="toggleNameEdit()">Cancel</button>
+                </form>
+            </div>
+            <p>Session ID: {{ user_id }}</p>
             <form action="{{ url_for('clear_session') }}" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Are you sure you want to clear all your data? This cannot be undone.')">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-danger">Clear My Data</button>
             </form>
         </div>
@@ -343,10 +403,9 @@
 
         <div class="task-form">
             <form action="{{ url_for('add_task') }}" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-row">
-                    <input type="text" name="title" placeholder="What needs to be done?" required>
-                    <select name="category" required>
+                    <input type="text" name="task" placeholder="What needs to be done?" required>
+                    <select name="category">
                         <option value="">Select Category</option>
                         <option value="work">💼 Work</option>
                         <option value="school">📚 School</option>
@@ -509,7 +568,7 @@
         // Load analytics charts
         fetch('/get_stats')
             .then(response => response.json())
-            .then(data => {
+            .then data => {
                 // Category chart
                 const categoryCtx = document.getElementById('categoryChart').getContext('2d');
                 new Chart(categoryCtx, {
@@ -558,6 +617,24 @@
                     }
                 });
             });
+            
+        // Function to toggle the name edit form
+        function toggleNameEdit() {
+            const nameForm = document.getElementById('nameForm');
+            if (nameForm.style.display === 'none') {
+                nameForm.style.display = 'flex';
+                nameForm.querySelector('input').focus();
+            } else {
+                nameForm.style.display = 'none';
+            }
+        }
     </script>
+    
+    <footer class="copyright">
+        <div class="container">
+            <p>&copy; 2025 Le'lah Mckoy. All rights reserved.</p>
+            <p><a href="https://github.com/LelahM/todoapp" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none;">View on GitHub</a></p>
+        </div>
+    </footer>
 </body>
 </html>

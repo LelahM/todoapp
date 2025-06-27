@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
-from flask_session import Session
 from datetime import datetime, timedelta
 import os
 import secrets
@@ -7,14 +6,6 @@ import uuid
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-key-for-demo-change-in-production')
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)  # Set session to last for 31 days
-app.config['SESSION_TYPE'] = 'filesystem'  # Store sessions on filesystem for better persistence
-app.config['SESSION_PERMANENT'] = True  # Make sessions permanent by default
-app.config['SESSION_FILE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flask_session')  # Store session files in this directory
-app.config['SESSION_USE_SIGNER'] = True  # Add an HMAC signature for security
-
-# Initialize the Session extension
-Session(app)
 
 # Simple user session-based storage
 class SimpleTask:
@@ -31,7 +22,6 @@ class SimpleTask:
 def get_user_id():
     """Get or create a unique user ID for this session"""
     if 'user_id' not in session:
-        session.permanent = True  # Ensure this specific session is permanent
         session['user_id'] = str(uuid.uuid4())
     return session['user_id']
 

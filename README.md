@@ -9,6 +9,8 @@ A beautiful, feature-rich task management application built with Flask, featurin
 - **🚫 No Shared Data**: Tasks from other users are completely hidden
 - **💾 Session Storage**: Data is stored securely in your browser session
 - **🗑️ Data Control**: Clear your data anytime with one click
+- **♻️ Persistent Data**: Your tasks remain available even after closing the browser
+- **⏳ Long-Lasting**: Sessions persist for 31 days without losing your data
 
 ## 🌐 Live Demo
 
@@ -62,8 +64,9 @@ Experience the full-featured todo application with real-time task management, pr
 - **Styling**: Custom CSS with Glassmorphism
 - **Icons**: Unicode Emojis
 - **Deployment**: Vercel (Serverless)
-- **Storage**: Private Session Storage (secure & isolated)
+- **Storage**: Flask-Session with filesystem persistence
 - **Privacy**: Individual user sessions with data isolation
+- **Persistence**: 31-day session lifetime with secure storage
 
 ## 📊 Database Structure
 
