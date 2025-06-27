@@ -1,30 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
-from flask_session import Session
 from datetime import datetime, timedelta
 import os
 import secrets
 import uuid
+import json
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-key-for-demo-change-in-production')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)  # Set session to last for 31 days
-app.config['SESSION_PERMANENT'] = True  # Make sessions permanent by default
-
-# Determine if we're running on Vercel (serverless) or locally
-is_vercel = os.environ.get('VERCEL') == '1'
-
-if is_vercel:
-    # On Vercel, use secure cookie-based sessions (filesystem storage won't work on serverless)
-    app.config['SESSION_TYPE'] = 'cookie'
-    app.config['SESSION_USE_SIGNER'] = True  # Add an HMAC signature for security
-else:
-    # For local development, use filesystem sessions
-    app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['SESSION_FILE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flask_session')
-    app.config['SESSION_USE_SIGNER'] = True
-
-# Initialize the Session extension
-Session(app)
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('PRODUCTION') == '1'  # Secure cookies in production
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript from accessing cookies
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
 
 # Simple user session-based storage
 class SimpleTask:
@@ -55,9 +41,14 @@ def set_user_name(name):
 
 def get_user_tasks():
     """Get tasks for the current user session"""
-    user_id = get_user_id()
-    tasks_key = f'tasks_{user_id}'
-    return session.get(tasks_key, [])
+    try:
+        user_id = get_user_id()
+        tasks_key = f'tasks_{user_id}'
+        tasks_data = session.get(tasks_key, [])
+        return tasks_from_session_data(tasks_data)
+    except Exception as e:
+        print(f"Error retrieving tasks: {e}")
+        return []
 
 def save_user_tasks(tasks):
     """Save tasks for the current user session"""
@@ -66,33 +57,71 @@ def save_user_tasks(tasks):
     # Convert task objects to dictionaries for session storage
     tasks_data = []
     for task in tasks:
-        tasks_data.append({
+        # Create a serializable dict with minimal data to fit in cookie size limits
+        task_dict = {
             'id': task.id,
-            'title': task.title,
-            'category': task.category,
-            'priority': task.priority,
-            'notes': task.notes,
+            'title': task.title[:100] if task.title else "",  # Limit title length
+            'category': task.category[:20] if task.category else "", 
+            'priority': task.priority[:10] if task.priority else "",
+            'notes': task.notes[:200] if task.notes else "",  # Limit notes length
             'due_date': task.due_date.isoformat() if task.due_date else None,
             'completed': task.completed,
-            'created_at': task.created_at.isoformat()
-        })
+            'created_at': task.created_at.isoformat() if task.created_at else datetime.utcnow().isoformat()
+        }
+        tasks_data.append(task_dict)
+    
+    # Ensure we're not exceeding cookie size limits (typically ~4KB)
+    # If too many tasks, keep only the most recent ones
+    if len(str(tasks_data)) > 3500:  # Leave some margin for other session data
+        tasks_data = tasks_data[-20:]  # Keep only the 20 most recent tasks
+    
     session[tasks_key] = tasks_data
 
 def tasks_from_session_data(tasks_data):
     """Convert session data back to task objects"""
     tasks = []
+    if not tasks_data:
+        return tasks
+    
     for data in tasks_data:
-        task = SimpleTask(
-            title=data['title'],
-            category=data['category'],
-            priority=data['priority'],
-            notes=data['notes'],
-            due_date=datetime.fromisoformat(data['due_date']) if data['due_date'] else None,
-            task_id=data['id']
-        )
-        task.completed = data['completed']
-        task.created_at = datetime.fromisoformat(data['created_at'])
-        tasks.append(task)
+        try:
+            # Handle potentially missing or malformed data
+            title = data.get('title', '')
+            category = data.get('category', '')
+            priority = data.get('priority', 'medium')
+            notes = data.get('notes', '')
+            due_date = None
+            if data.get('due_date'):
+                try:
+                    due_date = datetime.fromisoformat(data['due_date'])
+                except (ValueError, TypeError):
+                    due_date = None
+            
+            task = SimpleTask(
+                title=title,
+                category=category,
+                priority=priority,
+                notes=notes,
+                due_date=due_date,
+                task_id=data.get('id', str(uuid.uuid4()))
+            )
+            task.completed = bool(data.get('completed', False))
+            
+            # Handle created_at date
+            try:
+                if data.get('created_at'):
+                    task.created_at = datetime.fromisoformat(data['created_at'])
+                else:
+                    task.created_at = datetime.utcnow()
+            except (ValueError, TypeError):
+                task.created_at = datetime.utcnow()
+                
+            tasks.append(task)
+        except Exception as e:
+            # Skip invalid task data
+            print(f"Error parsing task data: {e}")
+            continue
+            
     return tasks
 
 # Simple CSRF token function
@@ -109,8 +138,10 @@ def index():
     try:
         # Get user-specific data
         user_name = get_user_name()
-        tasks_data = get_user_tasks()
-        tasks = tasks_from_session_data(tasks_data)
+        tasks = get_user_tasks()  # Now returns Task objects directly
+        
+        # Set up session permanence on each request
+        session.permanent = True
         
         complete_tasks = len([task for task in tasks if task.completed])
         total_tasks = len(tasks)
