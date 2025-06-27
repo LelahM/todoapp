@@ -349,8 +349,8 @@ To add your own screenshot of the live app to the README:
 
 ---
 
-**Made with ❤️ by Le'lah Mckoy ([LelahM](https://github.com/LelahM))**
+**Made with ❤️ by [Le'lah Mckoy](https://github.com/LelahM)**
+
+© 2025 Le'lah Mckoy. All rights reserved.
 
 *GetTasked - Get organized, get productive, get things done!* ✨
-
-© 2025 Le'lah Mckoy. All Rights Reserved.
