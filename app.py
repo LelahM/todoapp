@@ -201,4 +201,5 @@ def get_motivation_message(completion_rate, user_name):
 
 if __name__ == '__main__':
     app = create_app()
+    print("GetTasked - © 2025 Le'lah Mckoy. All Rights Reserved.")
     app.run(debug=True, port=5001)

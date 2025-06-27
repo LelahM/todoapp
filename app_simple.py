@@ -172,4 +172,5 @@ def get_motivation_message(completion_rate, user_name):
         return f"Ready to make today amazing, {user_name}? Start with one task! ⭐"
 
 if __name__ == '__main__':
+    print("GetTasked - © 2025 Le'lah Mckoy. All Rights Reserved.")
     app.run(debug=True, port=5001)
