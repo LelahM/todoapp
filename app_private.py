@@ -8,10 +8,20 @@ import uuid
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-key-for-demo-change-in-production')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)  # Set session to last for 31 days
-app.config['SESSION_TYPE'] = 'filesystem'  # Store sessions on filesystem for better persistence
 app.config['SESSION_PERMANENT'] = True  # Make sessions permanent by default
-app.config['SESSION_FILE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flask_session')  # Store session files in this directory
-app.config['SESSION_USE_SIGNER'] = True  # Add an HMAC signature for security
+
+# Determine if we're running on Vercel (serverless) or locally
+is_vercel = os.environ.get('VERCEL') == '1'
+
+if is_vercel:
+    # On Vercel, use secure cookie-based sessions (filesystem storage won't work on serverless)
+    app.config['SESSION_TYPE'] = 'cookie'
+    app.config['SESSION_USE_SIGNER'] = True  # Add an HMAC signature for security
+else:
+    # For local development, use filesystem sessions
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_FILE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flask_session')
+    app.config['SESSION_USE_SIGNER'] = True
 
 # Initialize the Session extension
 Session(app)
