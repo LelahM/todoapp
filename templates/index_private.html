@@ -379,8 +379,8 @@
             <h2>Hello, {{ user.name }}! 👋</h2>
             <div class="name-edit-container">
                 <button type="button" onclick="toggleNameEdit();" class="btn btn-small">Edit Name</button>
-                <form id="nameForm" action="{{ url_for('update_name') }}" method="POST" style="display: none; margin-top: 10px;">
-                    <input type="text" name="name" placeholder="Enter your name" value="{{ user.name }}" required style="margin-right: 10px; padding: 8px; border-radius: 4px; border: none; color: #333;">
+                <form id="nameForm" action="{{ url_for('update_name') }}" method="POST" style="display: none; margin-top: 10px;" onsubmit="return validateNameForm();">
+                    <input type="text" id="nameInput" name="name" placeholder="Enter your name" value="{{ user.name }}" required style="margin-right: 10px; padding: 8px; border-radius: 4px; border: none; color: #333;">
                     <button type="submit" class="btn">Save</button>
                     <button type="button" class="btn" onclick="toggleNameEdit(); return false;">Cancel</button>
                 </form>

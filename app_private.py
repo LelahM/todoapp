@@ -249,18 +249,32 @@ def delete_task(task_id):
         print(f"Error deleting task: {e}")
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/update_name', methods=['POST'])
+@app.route('/update_name', methods=['POST', 'GET'])
 def update_name():
     try:
-        name = request.form.get('name')
+        print("Update name route accessed!")
+        print(f"Request method: {request.method}")
+        print(f"Form data: {request.form}")
+        
+        # For debugging, allow both GET and POST
+        if request.method == 'GET':
+            name = request.args.get('name', 'Test User')
+        else:
+            name = request.form.get('name')
+            
         if name:
             print(f"Setting user name to: {name}")
             set_user_name(name)
+            session.modified = True  # Ensure session is saved
+            print(f"User name after setting: {get_user_name()}")
         else:
             print("No name provided in form")
+            
         return redirect(url_for('index'))
     except Exception as e:
         print(f"Error updating name: {e}")
+        import traceback
+        traceback.print_exc()
         return redirect(url_for('index'))
 
 @app.route('/get_stats')
