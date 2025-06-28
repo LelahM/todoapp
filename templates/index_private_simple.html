@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetTasked - Private Session</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .task-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .task-form input, .task-form select, .task-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .task-form input::placeholder, .task-form textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .task-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .task-content {
+            flex: 1;
+            margin-left: 15px;
+        }
+        .name-form {
+            display: none;
+            margin-top: 10px;
+        }
+        .name-form input {
+            display: inline-block;
+            width: auto;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; font-size: 3rem; margin-bottom: 20px;">GetTasked</h1>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2>Hello, {{ user.name }}! 👋</h2>
+            
+            {% if name_updated %}
+                <div style="background: rgba(29, 209, 161, 0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                    ✅ Name updated successfully!
+                </div>
+            {% endif %}
+            
+            {% if name_error %}
+                <div style="background: rgba(255, 107, 107, 0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                    ❌ Error updating name. Please try again.
+                </div>
+            {% endif %}
+            
+            <button onclick="toggleNameEdit()" class="btn">Edit Name</button>
+            <form id="nameForm" action="{{ url_for('update_name') }}" method="POST" class="name-form">
+                <input type="text" name="name" value="{{ user.name }}" required>
+                <button type="submit" class="btn">Save</button>
+                <button type="button" onclick="toggleNameEdit()" class="btn">Cancel</button>
+            </form>
+            
+            <p>Progress: {{ complete_tasks }}/{{ total_tasks }} completed</p>
+            
+            <form action="{{ url_for('clear_session') }}" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Clear all data?')">
+                <button type="submit" class="btn" style="background: rgba(255, 107, 107, 0.3);">Clear My Data</button>
+            </form>
+        </div>
+
+        <div class="task-form">
+            <h3>Add New Task</h3>
+            <form action="{{ url_for('add_task') }}" method="POST">
+                <input type="text" name="task" placeholder="What needs to be done?" required>
+                <select name="category">
+                    <option value="">Select Category</option>
+                    <option value="work">💼 Work</option>
+                    <option value="school">📚 School</option>
+                    <option value="personal">👤 Personal</option>
+                    <option value="shopping">🛒 Shopping</option>
+                    <option value="other">📋 Other</option>
+                </select>
+                <select name="priority" required>
+                    <option value="">Priority</option>
+                    <option value="high">🔴 High</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="low">🟢 Low</option>
+                </select>
+                <input type="datetime-local" name="due_date" required>
+                <textarea name="notes" placeholder="Task notes (optional)" rows="2"></textarea>
+                <button type="submit" class="btn">Add Task</button>
+            </form>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h3>📋 Active Tasks</h3>
+                {% for task in tasks %}
+                    {% if not task.completed %}
+                    <div class="task-item">
+                        <input type="checkbox" onchange="toggleTask('{{ task.id }}')">
+                        <div class="task-content">
+                            <div><strong>{{ task.title }}</strong></div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">
+                                📂 {{ task.category.title() if task.category else 'No Category' }} | 
+                                ⭐ {{ task.priority.title() }}
+                                {% if task.due_date %} | 📅 {{ task.due_date.strftime('%m/%d %I:%M %p') }}{% endif %}
+                            </div>
+                            {% if task.notes %}
+                                <div style="font-size: 0.9rem; margin-top: 5px;">{{ task.notes }}</div>
+                            {% endif %}
+                        </div>
+                        <button onclick="deleteTask('{{ task.id }}')" class="btn" style="background: rgba(255, 107, 107, 0.3);">🗑️</button>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if not tasks or not tasks|selectattr('completed', 'equalto', false)|list %}
+                    <p style="text-align: center; opacity: 0.7; margin: 20px 0;">No active tasks! 🌟</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <h3>✅ Completed Tasks</h3>
+                {% for task in tasks %}
+                    {% if task.completed %}
+                    <div class="task-item" style="opacity: 0.7;">
+                        <input type="checkbox" checked onchange="toggleTask('{{ task.id }}')">
+                        <div class="task-content">
+                            <div><strong>{{ task.title }}</strong></div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">
+                                📂 {{ task.category.title() if task.category else 'No Category' }} | 
+                                ⭐ {{ task.priority.title() }}
+                                {% if task.due_date %} | 📅 {{ task.due_date.strftime('%m/%d %I:%M %p') }}{% endif %}
+                            </div>
+                        </div>
+                        <button onclick="deleteTask('{{ task.id }}')" class="btn" style="background: rgba(255, 107, 107, 0.3);">🗑️</button>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if not tasks|selectattr('completed', 'equalto', true)|list %}
+                    <p style="text-align: center; opacity: 0.7; margin: 20px 0;">No completed tasks yet! ⏰</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Charts -->
+    {% if total_tasks > 0 %}
+    <div style="display: flex; justify-content: space-between; margin: 30px 0; flex-wrap: wrap;">
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; width: 48%; margin-bottom: 20px;">
+            <h3 style="text-align: center; color: #4ecdc4; margin-bottom: 20px;">Task Completion</h3>
+            <canvas id="completionChart" style="max-height: 300px;"></canvas>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; width: 48%; margin-bottom: 20px;">
+            <h3 style="text-align: center; color: #4ecdc4; margin-bottom: 20px;">Tasks by Category</h3>
+            <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        // Create charts if we have tasks
+        {% if total_tasks > 0 %}
+        // Completion Chart
+        const completionCtx = document.getElementById('completionChart').getContext('2d');
+        const completionData = {
+            labels: ['Completed', 'Pending'],
+            datasets: [{
+                data: [{{ complete_tasks }}, {{ total_tasks - complete_tasks }}],
+                backgroundColor: ['rgba(29, 209, 161, 0.8)', 'rgba(108, 92, 231, 0.8)'],
+                borderColor: ['#1dd1a1', '#6c5ce7'],
+                borderWidth: 1
+            }]
+        };
+        
+        new Chart(completionCtx, {
+            type: 'doughnut',
+            data: completionData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: 'white' }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Task Completion',
+                        color: 'white',
+                        font: { size: 16 }
+                    }
+                }
+            }
+        });
+
+        // Category Chart - fetch data from backend
+        fetch('{{ url_for("get_stats") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.categories) {
+                    const categoryLabels = Object.keys(data.categories);
+                    const categoryData = Object.values(data.categories);
+                    
+                    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+                    new Chart(categoryCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: categoryLabels,
+                            datasets: [{
+                                label: 'Tasks by Category',
+                                data: categoryData,
+                                backgroundColor: [
+                                    'rgba(78, 205, 196, 0.8)',
+                                    'rgba(255, 107, 107, 0.8)',
+                                    'rgba(255, 217, 61, 0.8)',
+                                    'rgba(108, 92, 231, 0.8)',
+                                    'rgba(29, 209, 161, 0.8)'
+                                ],
+                                borderColor: [
+                                    '#4ecdc4', '#ff6b6b', '#ffd93d', '#6c5ce7', '#1dd1a1'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                title: {
+                                    display: true,
+                                    text: 'Tasks by Category',
+                                    color: 'white',
+                                    font: { size: 16 }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { color: 'white' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                },
+                                x: {
+                                    ticks: { color: 'white' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching chart data:', error));
+        {% endif %}
+
+        function toggleNameEdit() {
+            const form = document.getElementById('nameForm');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+                form.querySelector('input').focus();
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        function toggleTask(taskId) {
+            fetch('/toggle_task/' + taskId, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating task');
+            });
+        }
+        
+        function deleteTask(taskId) {
+            if (confirm('Delete this task?')) {
+                fetch('/delete_task/' + taskId, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting task');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

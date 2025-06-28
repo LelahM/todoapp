@@ -142,9 +142,12 @@ def inject_csrf_token():
 @app.route('/')
 def index():
     try:
+        print("Index route called")
         # Get user-specific data
         user_name = get_user_name()
+        print(f"User name: {user_name}")
         tasks = get_user_tasks()  # Now returns Task objects directly
+        print(f"Number of tasks: {len(tasks)}")
         
         # Set up session permanence on each request
         session.permanent = True
@@ -174,7 +177,8 @@ def index():
         name_updated = session.pop('name_updated', False)
         name_error = session.pop('name_error', False)
         
-        return render_template('index_private.html',
+        print("About to render template")
+        result = render_template('index_private_simple.html',
                              user=user,
                              tasks=tasks,
                              complete_tasks=complete_tasks,
@@ -188,8 +192,12 @@ def index():
                              name_updated=name_updated,
                              name_error=name_error,
                              datetime=datetime)
+        print(f"Template rendered, length: {len(result)}")
+        return result
     except Exception as e:
         print(f"Error in index route: {e}")
+        import traceback
+        traceback.print_exc()
         return f"<h1>GetTasked - Private Mode</h1><p>Error: {str(e)}</p><p>Your data is private to your session.</p>"
 
 @app.route('/add_task', methods=['POST'])
@@ -200,7 +208,18 @@ def add_task():
         priority = request.form.get('priority')
         notes = request.form.get('notes')
         due_date_str = request.form.get('due_date')
-        due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M') if due_date_str else None
+        due_date = None
+        if due_date_str:
+            try:
+                # Try datetime format first (from datetime-local input)
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M')
+            except ValueError:
+                try:
+                    # Fallback to date format (from date input)
+                    due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+                except ValueError:
+                    # If both fail, set to None
+                    due_date = None
         
         # Get current user's tasks (this already returns processed task objects)
         tasks = get_user_tasks()
