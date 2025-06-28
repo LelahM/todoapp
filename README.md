@@ -19,6 +19,27 @@ A beautiful, feature-rich task management application built with Flask, featurin
 
 Experience the full-featured todo application with real-time task management, progress tracking, and beautiful visualizations.
 
+## ✅ Recent Fixes (June 28, 2025)
+
+**Critical Issues Resolved:**
+1. **Name Editing Functionality** - Fixed form field mismatch and corrupted JavaScript - ✅ Working
+2. **Charts Display** - Restored Chart.js integration and fixed template corruption - ✅ Working  
+3. **Date Parsing** - Enhanced to support both date and datetime formats - ✅ Working
+4. **Session Persistence** - Improved reliability for long-running sessions - ✅ Working
+
+**Technical Details:**
+- Fixed Flask route form field name (`'title'` → `'task'`)
+- Restored Chart.js CDN and chart creation code
+- Added completion chart (doughnut) and category chart (bar)
+- Enhanced error handling for date input formats
+- Improved session security with cryptographic signing
+
+**Verification:**
+- ✅ Name editing: User can update display name successfully
+- ✅ Task management: Add, complete, and delete tasks working
+- ✅ Charts: Visual analytics displaying completion and category data
+- ✅ Data persistence: Sessions maintain data across browser sessions
+
 ## ✨ Features
 
 ### 📋 **Task Management**
