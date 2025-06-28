@@ -100,6 +100,18 @@
     <div class="container">
         <h1 class="app-title">GetTasked</h1>
         
+        <!-- Privacy Indicator -->
+        <div style="text-align: center; background: rgba(76, 205, 196, 0.2); border-radius: 15px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(76, 205, 196, 0.3);">
+            <span style="font-size: 1.2rem; margin-right: 8px;">🔒</span>
+            <strong>Private Session Active</strong> - Your data is secure, only visible to you, and will persist for 31 days
+        </div>
+        
+        <!-- Session Persistence Notice -->
+        <div style="text-align: center; background: rgba(108, 92, 231, 0.2); border-radius: 15px; padding: 10px; margin-bottom: 20px; border: 1px solid rgba(108, 92, 231, 0.3); font-size: 0.9rem;">
+            <span style="font-size: 1.1rem; margin-right: 8px;">💾</span>
+            Your tasks will be saved even if you close this tab or browser
+        </div>
+        
         <div style="text-align: center; margin-bottom: 30px;">
             <h2>Hello, {{ user.name }}! 👋</h2>
             
@@ -122,10 +134,11 @@
                 <button type="button" onclick="toggleNameEdit()" class="btn">Cancel</button>
             </form>
             
+            <p>Session ID: <span style="font-family: monospace; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">{{ user.id }}</span></p>
             <p>Progress: {{ complete_tasks }}/{{ total_tasks }} completed</p>
             
-            <form action="{{ url_for('clear_session') }}" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Clear all data?')">
-                <button type="submit" class="btn" style="background: rgba(255, 107, 107, 0.3);">Clear My Data</button>
+            <form action="{{ url_for('clear_session') }}" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Are you sure you want to clear all your data? This cannot be undone.')">
+                <button type="submit" class="btn" style="background: rgba(255, 107, 107, 0.3);">🗑️ Clear My Data</button>
             </form>
         </div>
 

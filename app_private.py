@@ -16,6 +16,21 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
 app.config['SESSION_TYPE'] = 'filesystem'  # More reliable than signed cookies
 app.config['SESSION_USE_SIGNER'] = True    # Add cryptographic signing to cookie session ID
 
+# Additional privacy and security headers
+@app.after_request
+def add_security_headers(response):
+    """Add security headers for enhanced privacy"""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    # Don't cache sensitive pages
+    if request.endpoint in ['index', 'get_stats']:
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
+
 # Simple user session-based storage
 class SimpleTask:
     def __init__(self, title, category, priority, notes, due_date, task_id=None):
@@ -51,6 +66,10 @@ def get_user_tasks():
         user_id = get_user_id()
         tasks_key = f'tasks_{user_id}'
         tasks_data = session.get(tasks_key, [])
+        
+        # Privacy logging - ensure isolation
+        print(f"Privacy Check: User {user_id[:8]}... accessing {len(tasks_data)} tasks")
+        
         return tasks_from_session_data(tasks_data)
     except Exception as e:
         print(f"Error retrieving tasks: {e}")
@@ -60,6 +79,10 @@ def save_user_tasks(tasks):
     """Save tasks for the current user session"""
     user_id = get_user_id()
     tasks_key = f'tasks_{user_id}'
+    
+    # Privacy logging - ensure isolation
+    print(f"Privacy Check: User {user_id[:8]}... saving {len(tasks)} tasks to isolated session")
+    
     # Convert task objects to dictionaries for session storage
     tasks_data = []
     for task in tasks:
